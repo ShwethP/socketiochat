@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "npm rebuild sqlite3 && node index.js"
   },
   "dependencies": {
     "@socket.io/cluster-adapter": "^0.2.2",
