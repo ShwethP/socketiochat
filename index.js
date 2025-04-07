@@ -77,7 +77,6 @@ import { dirname, join } from 'node:path';
 import { Server } from 'socket.io';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import { createAdapter } from '@socket.io/cluster-adapter';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const port = process.env.PORT || 10000;
@@ -96,7 +95,7 @@ await db.exec(`
 `);
 
 const app = express();
-app.use(express.static(join(__dirname))); // Serve index.html and other static files
+app.use(express.static(join(__dirname))); // to serve index.html
 
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'));
@@ -104,8 +103,7 @@ app.get('/', (req, res) => {
 
 const server = createServer(app);
 const io = new Server(server, {
-    connectionStateRecovery: {},
-    adapter: createAdapter()
+    connectionStateRecovery: {}
 });
 
 io.on('connection', async (socket) => {
@@ -115,7 +113,7 @@ io.on('connection', async (socket) => {
             result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
         } catch (e) {
             if (e.errno === 19) {
-                callback(); // duplicate message, do nothing
+                callback(); // duplicate
                 return;
             }
         }
@@ -133,7 +131,7 @@ io.on('connection', async (socket) => {
                 }
             );
         } catch (e) {
-            // handle silently
+            // silently fail
         }
     }
 });
